@@ -1,0 +1,45 @@
+# ? Kustomize
+# Kustomize is a configuration-management tool for Kubernetes YAML (yaml files
+# written in the specific schema Kubernetes understands) — it lets you
+# keep one set of "base" manifests and layer environment-specific
+# changes (overlays) on top, without copy-pasting or templating the base
+# files themselves
+
+# ? kustomization.yaml
+# This is Kustomize's entry-point file for the overlays/session/ directory.
+# Running `kustomize build overlays/session` (or `kubectl apply -k`) reads
+# this file and proces the final merged YAML sent to the cluster, by
+# layering transformations on top of `base/` without every copying or
+# forking its files
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# pulls in everything declared in base/kustomization.yaml
+resources:
+  - ../../base
+
+# finds any container image in the resourses matching name, and
+# overrides its tag with newTag. This is the hook the CI job will
+# use later — instead of hand-editing the Deployment, CI just runs
+# `kustomize edit set image ...` here to bump the tag
+images:
+  - name: 555044956548.dkr.ecr.us-east-1.amazonaws.com/quickbite/account-service
+    # overwritten by CI's GitOps-commit step on each push
+    newTag: placeholder
+
+# generates a brand-new ConfigMap from the literals, appends a content
+# hash to its name, and auto-rewrites any `configMapRef` in the pulled-in
+# resources to point at that hashed name
+configMapGenerator:
+  - name: account-service-config
+    literals:
+      - PORT=4003
+      # TODO(Phase D): replace once the session-stack RDS instance exists
+      - POSTGRES_HOST=REPLACE_ME_WHEN_RDS_EXISTS
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=account
+      # TODO(Phase D): replace once Auth0/identity provider is wired up
+      - AUTH0_DOMAIN=REPLACE_ME
+      - AUTH0_AUDIENCE=REPLACE_ME
+      - CORS_ORIGINS=REPLACE_ME

@@ -1,0 +1,26 @@
+name: validate-manifests
+
+on:
+  pull_request:
+    paths:
+      - 'apps/**'
+      - '.github/workflows/validate.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'apps/**'
+      - '.github/workflows/validate.yml'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: imranismail/setup-kustomize@v2
+      - name: Validate all overlays build
+        run: |
+          set -e
+          for dir in apps/*/overlays/*/; do
+            echo "Validating $dir"
+            kustomize build "$dir" > /dev/null
+          done
