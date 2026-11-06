@@ -17,29 +17,30 @@ kind: Kustomization
 
 # pulls in everything declared in base/kustomization.yaml
 resources:
-  - ../../base
+- ../../base
 
 # finds any container image in the resourses matching name, and
 # overrides its tag with newTag. This is the hook the CI job will
 # use later — instead of hand-editing the Deployment, CI just runs
 # `kustomize edit set image ...` here to bump the tag
-images:
-  - name: 555044956548.dkr.ecr.us-east-1.amazonaws.com/quickbite/account-service
     # overwritten by CI's GitOps-commit step on each push
-    newTag: placeholder
+images:
+- name: 555044956548.dkr.ecr.us-east-1.amazonaws.com/quickbite/account-service
+  newName: 555044956548.dkr.ecr.us-east-1.amazonaws.com/quickbite/account-service
+  newTag: 3a0468e07379ef690a5d18c67cb4f68db178ce86
 
 # generates a brand-new ConfigMap from the literals, appends a content
 # hash to its name, and auto-rewrites any `configMapRef` in the pulled-in
 # resources to point at that hashed name
-configMapGenerator:
-  - name: account-service-config
-    literals:
-      - PORT=4003
       # TODO(Phase D): replace once the session-stack RDS instance exists
-      - POSTGRES_HOST=REPLACE_ME_WHEN_RDS_EXISTS
-      - POSTGRES_PORT=5432
-      - POSTGRES_DB=account
       # TODO(Phase D): replace once Auth0/identity provider is wired up
-      - AUTH0_DOMAIN=REPLACE_ME
-      - AUTH0_AUDIENCE=REPLACE_ME
-      - CORS_ORIGINS=REPLACE_ME
+configMapGenerator:
+- literals:
+  - PORT=4003
+  - POSTGRES_HOST=REPLACE_ME_WHEN_RDS_EXISTS
+  - POSTGRES_PORT=5432
+  - POSTGRES_DB=account
+  - AUTH0_DOMAIN=REPLACE_ME
+  - AUTH0_AUDIENCE=REPLACE_ME
+  - CORS_ORIGINS=REPLACE_ME
+  name: account-service-config
