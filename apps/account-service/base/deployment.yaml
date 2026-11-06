@@ -1,0 +1,72 @@
+# ? deployment.yaml
+# Kubernetes object that manages a set of identical Pod (smallest deployable unit — one or more containers)
+# replicas for you — it creates them, replaces crashed ones, and handles rolling updates when Pod spec
+# changes (new image, new config, etc.) instead of you managing individual Pods by hand
+
+apiVersion: apps/v1
+kind: Deployment
+# the Deployment's name within its namespace
+metadata:
+  name: account-service
+spec:
+  replicas: 1
+  # tells the Deployment which Pods belong to it, by label match.
+  # must match the labels below
+  selector:
+    matchLabels:
+      app: account-service
+  # the Pod template: the actual spec stamped out for every replica
+  template:
+    metadata:
+      # labels apllied to each Pod; this is what selector above
+      # matches against, and what Service also matches to route traffic
+      labels:
+        app: account-service
+    spec:
+      # pod-level safety rail
+      securityContext:
+        runAsNonRoot: true
+      
+      containers:
+        - name: account-service
+          # overlays set the real ECR image + tag via kustomize's `images:` field
+          image: 555044956548.dkr.ecr.us-east-1.amazonaws.com/quickbite/account-service:placeholder
+          ports:
+            - containerPort: 4003
+          envFrom:
+            # created by the overlay's configMapGenerator
+            - configMapRef:
+                name: account-service-config
+            # not created here — populated by External Secrets Operator in Phase D
+            - secretRef:
+                name: account-service-secrets
+          # blocks a process from gaining more privileges than its parent
+          securityContext:
+            allowPrivilegeEscalation: false
+          # periodic health check; if it fails repeatedly, k8s kills
+          # and restarts the container
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 4003
+            # wait before the first check
+            initialDelaySeconds: 5
+            # then check every 10s
+            periodSeconds: 10
+          # same check, but failure just pulls the Pod out of Service
+          # traffic routing rather than restarting it
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 4003
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            # the CPU/memory the scheduler reserves for this container
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            # the container is throttled (CPU) or killed/OOM (memory) if it exceeds this
+            limits:
+              cpu: 250m
+              memory: 256Mi

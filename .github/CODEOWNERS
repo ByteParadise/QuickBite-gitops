@@ -1,1 +1,9 @@
-* @ByteParadise/platform
+# Platform team owns repo-wide tooling/CI
+/.github/                          @ByteParadise/platform
+CODEOWNERS                         @ByteParadise/platform
+
+# Service-specific manifests, owned by each service's team
+/apps/account-service/             @ByteParadise/accounts
+/apps/restaurant-service/          @ByteParadise/restaurants
+/apps/order-service/               @ByteParadise/orders
+
