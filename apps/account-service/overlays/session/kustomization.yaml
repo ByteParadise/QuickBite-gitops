@@ -39,12 +39,20 @@ images:
 configMapGenerator:
   - name: account-service-config
     literals:
+      - AWS_REGION=us-east-1
       - PORT=4003
-      # TODO(Phase D): replace once the session-stack RDS instance exists
-      - POSTGRES_HOST=REPLACE_ME_WHEN_RDS_EXISTS
+      # the RDS Proxy's endpoint, NOT the raw RDS instance's — all
+      # connections go through the proxy now that it enforces IAM auth
+      - POSTGRES_HOST=REPLACE_ME_WITH_RDS_PROXY_ENDPOINT
       - POSTGRES_PORT=5432
       - POSTGRES_DB=account
+      # not secret — IAM auth replaces the password entirely, so the
+      # username alone is no more sensitive than the DB name above.
+      # must match rds.tf's aws_db_instance.account_service.username
+      - POSTGRES_USER=account_service_app
       # TODO(Phase D): replace once Auth0/identity provider is wired up
-      - AUTH0_DOMAIN=REPLACE_ME
-      - AUTH0_AUDIENCE=REPLACE_ME
-      - CORS_ORIGINS=REPLACE_ME
+      - AUTH0_DOMAIN=dev-syl7b8tbl6zxwq8i.us.auth0.com
+      - AUTH0_AUDIENCE=https://quickbite-account-service
+
+      # STRIPE_SECRET_KEY is the only one of these actually sensitive —
+      # it comes from account-service-secrets (externalsecret.yaml) instead
