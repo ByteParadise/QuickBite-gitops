@@ -6,3 +6,4 @@ CODEOWNERS                         @ByteParadise/platform
 /apps/account-service/             @ByteParadise/accounts
 /apps/restaurant-service/          @ByteParadise/restaurants
 /apps/order-service/               @ByteParadise/orders
+
