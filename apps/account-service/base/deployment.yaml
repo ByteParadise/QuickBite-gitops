@@ -23,10 +23,14 @@ spec:
       labels:
         app: account-service
     spec:
+      # matches the ServiceAccount from serviceaccount.yaml — this is what
+      # Terraform's aws_eks_pod_identity_association actually keys off of
+      serviceAccountName: account-service
       # pod-level safety rail
       securityContext:
         runAsNonRoot: true
-      
+        runAsUser: 1001
+
       containers:
         - name: account-service
           # overlays set the real ECR image + tag via kustomize's `images:` field

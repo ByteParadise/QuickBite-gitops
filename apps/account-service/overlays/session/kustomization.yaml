@@ -19,28 +19,44 @@ kind: Kustomization
 resources:
 - ../../base
 
+# applied to every namespaced resource pulled in above (Deployment, Service,
+# ConfigMap, ServiceAccount) — Kustomize automatically skips cluster-scoped
+# kinds like Namespace itself, so this doesn't conflict with namespace.yaml
+namespace: account-service
+
 # finds any container image in the resourses matching name, and
 # overrides its tag with newTag. This is the hook the CI job will
 # use later — instead of hand-editing the Deployment, CI just runs
 # `kustomize edit set image ...` here to bump the tag
-    # overwritten by CI's GitOps-commit step on each push
 images:
-- name: 555044956548.dkr.ecr.us-east-1.amazonaws.com/quickbite/account-service
-  newName: 555044956548.dkr.ecr.us-east-1.amazonaws.com/quickbite/account-service
-  newTag: e0440f1e0895470726d2845ae1ddb192bfdbadf6
+  - name: 555044956548.dkr.ecr.us-east-1.amazonaws.com/quickbite/account-service
+    # overwritten by CI's GitOps-commit step on each push
+    newTag: e0440f1e0895470726d2845ae1ddb192bfdbadf6
 
 # generates a brand-new ConfigMap from the literals, appends a content
 # hash to its name, and auto-rewrites any `configMapRef` in the pulled-in
 # resources to point at that hashed name
-      # TODO(Phase D): replace once the session-stack RDS instance exists
-      # TODO(Phase D): replace once Auth0/identity provider is wired up
 configMapGenerator:
-- literals:
-  - PORT=4003
-  - POSTGRES_HOST=REPLACE_ME_WHEN_RDS_EXISTS
-  - POSTGRES_PORT=5432
-  - POSTGRES_DB=account
-  - AUTH0_DOMAIN=REPLACE_ME
-  - AUTH0_AUDIENCE=REPLACE_ME
-  - CORS_ORIGINS=REPLACE_ME
-  name: account-service-config
+  - name: account-service-config
+    # POSTGRES_HOST lives in .env.session instead of a literal below —
+    # it's a real AWS resource endpoint for this specific cluster, not a
+    # credential, but not something to publish in this public repo either.
+    # .env.session is gitignored (matches the .env.* rule); re-create it
+    # locally from session/'s `rds_proxy_endpoint` terraform output.
+    envs:
+      - .env.session
+    literals:
+      - AWS_REGION=us-east-1
+      - PORT=4003
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=account
+      # not secret — IAM auth replaces the password entirely, so the
+      # username alone is no more sensitive than the DB name above.
+      # must match rds.tf's aws_db_instance.account_service.username
+      - POSTGRES_USER=account_service_app
+      # TODO(Phase D): replace once Auth0/identity provider is wired up
+      - AUTH0_DOMAIN=dev-syl7b8tbl6zxwq8i.us.auth0.com
+      - AUTH0_AUDIENCE=https://quickbite-account-service
+
+      # STRIPE_SECRET_KEY is the only one of these actually sensitive —
+      # it comes from account-service-secrets (externalsecret.yaml) instead
