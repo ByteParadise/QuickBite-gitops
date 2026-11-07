@@ -17,7 +17,7 @@ kind: Kustomization
 
 # pulls in everything declared in base/kustomization.yaml
 resources:
-  - ../../base
+- ../../base
 
 # applied to every namespaced resource pulled in above (Deployment, Service,
 # ConfigMap, ServiceAccount) — Kustomize automatically skips cluster-scoped
@@ -28,8 +28,6 @@ namespace: account-service
 # overrides its tag with newTag. This is the hook the CI job will
 # use later — instead of hand-editing the Deployment, CI just runs
 # `kustomize edit set image ...` here to bump the tag
-images:
-  - name: 555044956548.dkr.ecr.us-east-1.amazonaws.com/quickbite/account-service
     # overwritten by CI's GitOps-commit step on each push
     newTag: 3a0468e07379ef690a5d18c67cb4f68db178ce86
 
