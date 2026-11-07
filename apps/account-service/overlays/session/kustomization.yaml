@@ -28,8 +28,10 @@ namespace: account-service
 # overrides its tag with newTag. This is the hook the CI job will
 # use later — instead of hand-editing the Deployment, CI just runs
 # `kustomize edit set image ...` here to bump the tag
+images:
+  - name: 555044956548.dkr.ecr.us-east-1.amazonaws.com/quickbite/account-service
     # overwritten by CI's GitOps-commit step on each push
-    newTag: 3a0468e07379ef690a5d18c67cb4f68db178ce86
+    newTag: e0440f1e0895470726d2845ae1ddb192bfdbadf6
 
 # generates a brand-new ConfigMap from the literals, appends a content
 # hash to its name, and auto-rewrites any `configMapRef` in the pulled-in
