@@ -31,19 +31,23 @@ namespace: account-service
 images:
   - name: 555044956548.dkr.ecr.us-east-1.amazonaws.com/quickbite/account-service
     # overwritten by CI's GitOps-commit step on each push
-    newTag: placeholder
+    newTag: 3a0468e07379ef690a5d18c67cb4f68db178ce86
 
 # generates a brand-new ConfigMap from the literals, appends a content
 # hash to its name, and auto-rewrites any `configMapRef` in the pulled-in
 # resources to point at that hashed name
 configMapGenerator:
   - name: account-service-config
+    # POSTGRES_HOST lives in .env.session instead of a literal below —
+    # it's a real AWS resource endpoint for this specific cluster, not a
+    # credential, but not something to publish in this public repo either.
+    # .env.session is gitignored (matches the .env.* rule); re-create it
+    # locally from session/'s `rds_proxy_endpoint` terraform output.
+    envs:
+      - .env.session
     literals:
       - AWS_REGION=us-east-1
       - PORT=4003
-      # the RDS Proxy's endpoint, NOT the raw RDS instance's — all
-      # connections go through the proxy now that it enforces IAM auth
-      - POSTGRES_HOST=REPLACE_ME_WITH_RDS_PROXY_ENDPOINT
       - POSTGRES_PORT=5432
       - POSTGRES_DB=account
       # not secret — IAM auth replaces the password entirely, so the

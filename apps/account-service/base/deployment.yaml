@@ -29,6 +29,7 @@ spec:
       # pod-level safety rail
       securityContext:
         runAsNonRoot: true
+        runAsUser: 1001
 
       containers:
         - name: account-service
