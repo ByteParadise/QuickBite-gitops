@@ -19,6 +19,11 @@ kind: Kustomization
 resources:
   - ../../base
 
+# applied to every namespaced resource pulled in above (Deployment, Service,
+# ConfigMap, ServiceAccount) — Kustomize automatically skips cluster-scoped
+# kinds like Namespace itself, so this doesn't conflict with namespace.yaml
+namespace: account-service
+
 # finds any container image in the resourses matching name, and
 # overrides its tag with newTag. This is the hook the CI job will
 # use later — instead of hand-editing the Deployment, CI just runs
