@@ -27,7 +27,7 @@ resources:
 images:
 - name: 555044956548.dkr.ecr.us-east-1.amazonaws.com/quickbite/account-service
   newName: 555044956548.dkr.ecr.us-east-1.amazonaws.com/quickbite/account-service
-  newTag: 3a0468e07379ef690a5d18c67cb4f68db178ce86
+  newTag: e0440f1e0895470726d2845ae1ddb192bfdbadf6
 
 # generates a brand-new ConfigMap from the literals, appends a content
 # hash to its name, and auto-rewrites any `configMapRef` in the pulled-in
