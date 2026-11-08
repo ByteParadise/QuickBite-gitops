@@ -72,5 +72,5 @@ spec:
               memory: 128Mi
             # the container is throttled (CPU) or killed/OOM (memory) if it exceeds this
             limits:
-              cpu: 250m
+              cpu: 300m
               memory: 256Mi
