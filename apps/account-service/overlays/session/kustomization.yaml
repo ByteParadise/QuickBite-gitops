@@ -28,29 +28,27 @@ namespace: account-service
 # overrides its tag with newTag. This is the hook the CI job will
 # use later — instead of hand-editing the Deployment, CI just runs
 # `kustomize edit set image ...` here to bump the tag
-images:
-  - name: 555044956548.dkr.ecr.us-east-1.amazonaws.com/quickbite/account-service
     # overwritten by CI's GitOps-commit step on each push
-    newTag: e0440f1e0895470726d2845ae1ddb192bfdbadf6
+images:
+- name: 555044956548.dkr.ecr.us-east-1.amazonaws.com/quickbite/account-service
+  newName: 555044956548.dkr.ecr.us-east-1.amazonaws.com/quickbite/account-service
+  newTag: cb0acc790756fd91ff69b2d75550dff8f360c9fa
 
 # generates a brand-new ConfigMap from the literals, appends a content
 # hash to its name, and auto-rewrites any `configMapRef` in the pulled-in
 # resources to point at that hashed name
-configMapGenerator:
-  - name: account-service-config
-    literals:
-      - AWS_REGION=us-east-1
-      - PORT=4003
-      - POSTGRES_PORT=5432
-      - POSTGRES_DB=account
-      - POSTGRES_HOST=quickbite-account-service.proxy-c43e08e8smkw.us-east-1.rds.amazonaws.com
       # not secret — IAM auth replaces the password entirely, so the
       # username alone is no more sensitive than the DB name above.
       # must match rds.tf's aws_db_instance.account_service.username
-      - POSTGRES_USER=account_service_app
       # TODO(Phase D): replace once Auth0/identity provider is wired up
-      - AUTH0_DOMAIN=dev-syl7b8tbl6zxwq8i.us.auth0.com
-      - AUTH0_AUDIENCE=https://quickbite-account-service
-
-      # STRIPE_SECRET_KEY is the only one of these actually sensitive —
-      # it comes from account-service-secrets (externalsecret.yaml) instead
+configMapGenerator:
+- literals:
+  - AWS_REGION=us-east-1
+  - PORT=4003
+  - POSTGRES_PORT=5432
+  - POSTGRES_DB=account
+  - POSTGRES_HOST=quickbite-account-service.proxy-c43e08e8smkw.us-east-1.rds.amazonaws.com
+  - POSTGRES_USER=account_service_app
+  - AUTH0_DOMAIN=dev-syl7b8tbl6zxwq8i.us.auth0.com
+  - AUTH0_AUDIENCE=https://quickbite-account-service
+  name: account-service-config
