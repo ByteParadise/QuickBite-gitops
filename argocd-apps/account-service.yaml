@@ -1,0 +1,42 @@
+
+# ? account-service.yaml
+# This is the leaf-level Argo CD Application for account-service — the
+# thing that tells Argo CD what to deploy and where. It's picked up
+# automatically by the bootstrap Application in argocd.tf, which watches
+# this whole argocd-apps/ directory.
+# This repo is public, so no repo credentials are
+# needed below — a private repo (e.g. a real product) would need a
+# Secret with a deploy key or scoped token here instead.
+
+apiVersion: argoproj.io/v1alpha1
+# Argo CD's own custom resource type (installed as a CRD by the Helm chart
+# in argocd.tf), distinct from any plain Kubernetes object.
+kind: Application
+metadata:
+  # the Application's own name within Argo CD
+  name: account-service
+  namespace: argocd
+spec:
+  project: default
+  # what to deploy: repoURL / targetRevision (this repo, main branch) plus path, 
+  # pointing at the exact Kustomize overlay that was previously applied manually
+  # via `kubectl apply -k`. Argo CD auto-detects it's a Kustomize directory and
+  # runs the equivalent of `kustomize build` on it itself.
+  source:
+    repoURL: https://github.com/ByteParadise/QuickBite-gitops.git
+    targetRevision: main
+    path: apps/account-service/overlays/session
+  # where to deploy: https://kubernetes.default.svc is the special in-cluster address
+  # meaning "this same cluster Argo CD is running on" (not some other remote cluster),
+  # and namespace is the target namespace
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: account-service
+  syncPolicy:
+    automated:
+      # if anyone manually changes something in the cluster (or if a previous `kubectl
+      # apply` leaves stray state), Argo CD reverts it back to match Git on its next
+      # reconciliation pass.
+      selfHeal: true
+      # if a resource is ever removed from Git, Argo CD deletes it from the cluster
+      prune: true
