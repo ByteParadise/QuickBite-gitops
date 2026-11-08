@@ -38,18 +38,12 @@ images:
 # resources to point at that hashed name
 configMapGenerator:
   - name: account-service-config
-    # POSTGRES_HOST lives in .env.session instead of a literal below —
-    # it's a real AWS resource endpoint for this specific cluster, not a
-    # credential, but not something to publish in this public repo either.
-    # .env.session is gitignored (matches the .env.* rule); re-create it
-    # locally from session/'s `rds_proxy_endpoint` terraform output.
-    envs:
-      - .env.session
     literals:
       - AWS_REGION=us-east-1
       - PORT=4003
       - POSTGRES_PORT=5432
       - POSTGRES_DB=account
+      - POSTGRES_HOST=quickbite-account-service.proxy-c43e08e8smkw.us-east-1.rds.amazonaws.com
       # not secret — IAM auth replaces the password entirely, so the
       # username alone is no more sensitive than the DB name above.
       # must match rds.tf's aws_db_instance.account_service.username
