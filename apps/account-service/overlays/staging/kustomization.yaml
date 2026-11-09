@@ -6,8 +6,8 @@
 # files themselves
 
 # ? kustomization.yaml
-# This is Kustomize's entry-point file for the overlays/session/ directory.
-# Running `kustomize build overlays/session` (or `kubectl apply -k`) reads
+# This is Kustomize's entry-point file for the overlays/staging/ directory.
+# Running `kustomize build overlays/staging` (or `kubectl apply -k`) reads
 # this file and proces the final merged YAML sent to the cluster, by
 # layering transformations on top of `base/` without every copying or
 # forking its files
