@@ -2,8 +2,10 @@
 # ? account-service.yaml
 # This is the leaf-level Argo CD Application for account-service — the
 # thing that tells Argo CD what to deploy and where. It's picked up
-# automatically by the bootstrap Application in argocd.tf, which watches
-# this whole argocd-apps/ directory.
+# automatically by the staging environment's bootstrap Application in
+# environments/staging/main.tf, which watches this argocd-apps/staging/
+# directory specifically — not argocd-apps/production/, so the staging
+# cluster never tries to sync production's Applications.
 # This repo is public, so no repo credentials are
 # needed below — a private repo (e.g. a real product) would need a
 # Secret with a deploy key or scoped token here instead.
@@ -25,7 +27,7 @@ spec:
   source:
     repoURL: https://github.com/ByteParadise/QuickBite-gitops.git
     targetRevision: main
-    path: apps/account-service/overlays/session
+    path: apps/account-service/overlays/staging
   # where to deploy: https://kubernetes.default.svc is the special in-cluster address
   # meaning "this same cluster Argo CD is running on" (not some other remote cluster),
   # and namespace is the target namespace

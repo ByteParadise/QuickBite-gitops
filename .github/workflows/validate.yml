@@ -22,7 +22,7 @@ jobs:
           set -e
           for dir in apps/*/overlays/*/; do
             echo "Validating $dir"
-            # gitignored env files (e.g. .env.session) referenced by
+            # gitignored env files (e.g. .env.staging) referenced by
             # configMapGenerator.envs don't exist in this checkout — create
             # empty placeholders just so kustomize build can run; real
             # values are supplied locally/at deploy time, never committed

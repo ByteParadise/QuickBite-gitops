@@ -1,0 +1,32 @@
+# ! scaffold only — this Application is never actually synced in this
+# project, since environments/production/'s Terraform (in the QuickBite
+# repo) is never applied, so no production Argo CD ever exists to read it.
+# It exists only so the dev/prod structure is real and reviewable.
+
+# ? account-service.yaml
+# the production counterpart of argocd-apps/staging/account-service.yaml
+# — would be picked up by production's own bootstrap Application
+# (environments/production/main.tf), watching argocd-apps/production/
+# specifically, never argocd-apps/staging/.
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: account-service
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/ByteParadise/QuickBite-gitops.git
+    # production tracks main, not a sprint branch — see the separate
+    # discussion on environment promotion for how a change actually
+    # reaches this path
+    targetRevision: main
+    path: apps/account-service/overlays/production
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: account-service
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true

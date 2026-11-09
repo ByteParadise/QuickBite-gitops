@@ -1,0 +1,37 @@
+# ! scaffold only — this overlay is never actually applied in this project.
+# It mirrors overlays/staging/'s shape so the dev/prod structure is real
+# and reviewable; see environments/production/ in the QuickBite repo's
+# Terraform for the matching infrastructure-side scaffold.
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- ../../base
+
+namespace: account-service
+
+# a real promotion workflow (discussed separately, not implemented here)
+# would set this to the exact image tag already built and tested during
+# the sprint — never a fresh build — once a sprint's changes are merged
+# into main
+images:
+- name: 555044956548.dkr.ecr.us-east-1.amazonaws.com/quickbite/account-service
+  newName: 555044956548.dkr.ecr.us-east-1.amazonaws.com/quickbite/account-service
+  newTag: REPLACE_ME
+
+configMapGenerator:
+- literals:
+  - AWS_REGION=us-east-1
+  - PORT=4003
+  - POSTGRES_PORT=5432
+  - POSTGRES_DB=account
+  # would be environments/production's own module.rds.proxy_endpoint
+  # output — never applied, so there's no real value to put here
+  - POSTGRES_HOST=REPLACE_ME
+  - POSTGRES_USER=account_service_app
+  # a real production environment should use its own Auth0 tenant,
+  # separate from staging's dev-* one
+  - AUTH0_DOMAIN=REPLACE_ME
+  - AUTH0_AUDIENCE=REPLACE_ME
+  name: account-service-config
