@@ -32,7 +32,7 @@ namespace: account-service
 images:
 - name: account-service
   newName: 555044956548.dkr.ecr.us-east-1.amazonaws.com/quickbite/account-service
-  newTag: cb0acc790756fd91ff69b2d75550dff8f360c9fa
+  newTag: 2d6ae38aec7a04ac59a90b36045562cab0f4f5de
 
 # generates a brand-new ConfigMap from the literals, appends a content
 # hash to its name, and auto-rewrites any `configMapRef` in the pulled-in
