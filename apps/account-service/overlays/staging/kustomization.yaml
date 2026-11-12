@@ -30,7 +30,7 @@ namespace: account-service
 # `kustomize edit set image ...` here to bump the tag
     # overwritten by CI's GitOps-commit step on each push
 images:
-- name: 555044956548.dkr.ecr.us-east-1.amazonaws.com/quickbite/account-service
+- name: account-service
   newName: 555044956548.dkr.ecr.us-east-1.amazonaws.com/quickbite/account-service
   newTag: cb0acc790756fd91ff69b2d75550dff8f360c9fa
 
