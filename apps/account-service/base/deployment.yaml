@@ -34,7 +34,7 @@ spec:
       containers:
         - name: account-service
           # overlays set the real ECR image + tag via kustomize's `images:` field
-          image: 555044956548.dkr.ecr.us-east-1.amazonaws.com/quickbite/account-service:placeholder
+          image: account-service:placeholder
           ports:
             - containerPort: 4003
           envFrom:
